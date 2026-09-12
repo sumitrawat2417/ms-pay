@@ -1,6 +1,6 @@
 <div align="center">
   <br />
-  <h1>💸 MS Pay</h1>
+  <h1>MS Pay</h1>
   <p>
     <strong>A semi-closed virtual currency wallet system where consumers don't need a phone to pay.</strong>
   </p>
@@ -119,9 +119,6 @@ mansula-pay/
 The system is extensively documented. Please review these before making any structural changes:
 
 1. **[Product Requirements Document](docs/project-req-doc.md)** - Payment modes, funding modes, and the double-entry accounting rules.
-2. **[Project Design Document](docs/project-design-doc.md)** - Visual branding, UI specs, and persona experiences.
-3. **[System Architecture Document](docs/system-architecture-doc.md)** - Data models, core domain flows, and money-safety mechanics.
-4. **[Tech Stack Document](docs/tech-stack-doc.md)** - Development tooling, CI/CD, and hosting strategy.
 
 ---
 <div align="center">

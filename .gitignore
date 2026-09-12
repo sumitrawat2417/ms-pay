@@ -44,3 +44,6 @@ prisma/*.db-journal
 
 # Ignored copies
 docs-copy (do not touch)/
+docs/project-design-doc.md
+docs/system-architecture-doc.md
+docs/tech-stack-doc.md
