@@ -1,85 +1,129 @@
-# MS Pay 💳
+<div align="center">
+  <br />
+  <h1>💸 MS Pay</h1>
+  <p>
+    <strong>A semi-closed virtual currency wallet system where consumers don't need a phone to pay.</strong>
+  </p>
+  <p>
+    <a href="#features">Features</a> •
+    <a href="#architecture">Architecture</a> •
+    <a href="#repository-structure">Repository Structure</a> •
+    <a href="#documentation">Documentation</a>
+  </p>
+  <br />
+</div>
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-In%20Development-orange.svg)
-![React PWA](https://img.shields.io/badge/Frontend-React_PWA-61DAFB.svg)
-![Node.js](https://img.shields.io/badge/Backend-Node.js-339933.svg)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1.svg)
+![Status: Development](https://img.shields.io/badge/Status-Development-orange?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-**MS Pay** is a robust, closed-loop digital wallet built directly into the MS Business Operating System (BOS). Designed for maximum checkout speed and reliability, it allows consumers to make instant, secure payments at participating merchants **without needing a smartphone, app, or active internet connection** at the point of sale.
+## 📖 Overview
 
----
+**MS Pay** is a multi-merchant virtual currency (MSP) wallet designed for maximum accessibility and uncompromised financial security. 
 
-## 🚀 Key Features
+It solves a critical gap in digital payments: **A consumer does not need a smartphone, an app, or an internet connection to pay.** With just a physical ID/QR card and a passcode, consumers can securely transact at any participating merchant. 
 
-*   **Hybrid Offline Architecture:** Merchant POS terminals can seamlessly process transactions even during internet outages, queuing them locally via IndexedDB and automatically syncing them to the central ledger when connectivity is restored.
-*   **Frictionless Checkout:** Consumers only need a static printed QR code (or Wallet ID) and their secret 4-digit PIN. No app downloads or mobile data required.
-*   **Secure Offline Guardrails:** The POS securely enforces an "Offline Spending Limit" (e.g., max ₹200) by caching hashed balance metrics, preventing debt accumulation during network downtime.
-*   **Masked Authentication:** Custom, secure POS keypad designs ensure the consumer's PIN is fully masked, eliminating shoulder-surfing risks.
-*   **Unified PWA Ecosystem:** A single React Progressive Web App (PWA) housing three distinct environments: Customer Portal, Merchant POS, and Admin Ledger.
-
----
-
-## 🏗️ System Architecture
-
-MS Pay utilizes a modern, robust tech stack designed to ensure financial data integrity and offline resilience.
-
-| Component | Technology | Description |
-| :--- | :--- | :--- |
-| **Frontend UI** | React (Vite), TypeScript | A unified PWA delivering distinct experiences for Customers, Merchants, and Admins. |
-| **Offline Engine** | Service Workers, Dexie.js | Leverages IndexedDB for secure local queuing of offline transactions on the Merchant POS. |
-| **Backend API** | Node.js (Express), TypeScript | A central API responsible for ledger management, PIN verification, and batch sync processing. |
-| **Database** | PostgreSQL | Strictly ACID-compliant relational database to guarantee the integrity of the financial ledger. |
+For users who *do* have smartphones, MS Pay provides a rich, polished PWA to approve requests remotely, recharge their wallets, and maintain complete control over their funds. Under the hood, a rigorous double-entry accounting system ensures every fraction of an MSP is perfectly reconciled.
 
 ---
 
-## 🔄 Core Workflows
+## ✨ Key Features
 
-### 1. The Online Checkout (Standard)
-1. Merchant scans the consumer's static QR code via the POS.
-2. Merchant enters the transaction amount.
-3. Consumer enters their secure PIN on the merchant's screen.
-4. The POS verifies the transaction with the backend in real-time, deducting the points and generating a receipt.
+### 🏦 For Consumers
+- **Device-less Payments**: Pay securely at any merchant using only an ID/QR card and a passcode.
+- **Scan & Pay (Mode B)**: Fully autonomous payments via the MS Pay Customer app.
+- **Request & Approve (Mode C)**: Review and approve merchant payment requests remotely, eliminating the need to blindly trust a merchant's screen.
+- **Real-time Cash-in**: Hand physical cash to a merchant and receive an instantly verified digital credit to your wallet.
 
-### 2. The Hybrid Offline Checkout (Network Down)
-1. Merchant scans the QR code; the POS detects the network is offline.
-2. The POS references its local encrypted cache to verify the user is within the **Offline Spending Limit**.
-3. Consumer enters their PIN (hashed and stored locally).
-4. The transaction is approved locally and placed in the **Sync Queue**. The queue keeps moving!
+### 🏪 For Merchants
+- **Seamless Collection**: Fast checkout using a merchant-assisted flow (Mode A) or static store QRs (Mode B).
+- **Remote Tab Management**: Request payments from consumers asynchronously.
+- **Cash-in Agent Capabilities**: Act as a cash deposit agent to formalize consumer funds, strictly reconciled via the merchant float ledger.
+- **Live Settlement Visibility**: Transparent tracking of live balance, collected cash, and net settlement owed.
 
-### 3. The Background Sync (Network Restored)
-1. The Service Worker detects restored connectivity.
-2. The POS automatically pushes the `PENDING_SYNC` queue to the backend.
-3. The backend strictly validates PINs and settles the central ledger.
+### 🛡️ Core Financial Safety
+- **Double-Entry Ledger**: A strict, auditable chart of accounts mapping every transaction type.
+- **Zero Offline Credits**: Preventing fabricated funds by ensuring all credit-producing actions are strictly online and synchronous.
+- **Atomic Operations**: All wallet mutations execute within atomic database transactions with mandatory idempotency keys.
+- **Reconciliation Invariant**: A release-blocking automated check ensuring Assets + Expenses exactly match Liabilities + Equity + Revenue.
 
 ---
 
-## 🛠️ Getting Started (Development)
+## 🏗️ Architecture
 
-> **Note:** The codebase is currently undergoing initial scaffolding.
+MS Pay enforces a strict **"three surfaces, one domain core"** rule. No frontend app is allowed its own divergent balance-mutation logic.
 
-### Prerequisites
-- Node.js (v18+)
-- PostgreSQL installed and running
+```mermaid
+flowchart TB
+    subgraph Frontend [Frontend — 3 PWAs]
+        C[Customer PWA]
+        M[Merchant PWA]
+        A[Admin PWA]
+    end
 
-### Installation (Coming Soon)
-```bash
-# Clone the repository
-git clone https://github.com/sumitrawat2417/ms-pay.git
+    subgraph Shared [Shared Packages]
+        UI[ui-components]
+        TY[shared-types]
+        API_C[api-client]
+    end
 
-# Navigate to the project directory
-cd ms-pay
+    subgraph Backend [Backend — Fastify]
+        R1[Customer routes]
+        R2[Merchant routes]
+        R3[Admin routes]
+        L[Ledger service]
+    end
 
-# Install Frontend dependencies
-cd frontend && npm install
+    DB[(PostgreSQL)]
 
-# Install Backend dependencies
-cd ../backend && npm install
+    C --> API_C
+    M --> API_C
+    A --> API_C
+    API_C --> R1
+    API_C --> R2
+    API_C --> R3
+    R1 --> L
+    R2 --> L
+    R3 --> L
+    L --> DB
 ```
 
-## 🔐 Security & Fraud Prevention
-*   **No PIN, No Sale:** A cloned QR code is useless without the user's secret passcode.
-*   **Encrypted Local Storage:** All queued offline transactions are encrypted on the merchant's device, preventing tampering before synchronization.
+---
+
+## 📂 Repository Structure
+
+This project is structured as a **pnpm workspace** monorepo:
+
+```text
+mansula-pay/
+├── apps/
+│   ├── customer-pwa/      # React + Vite (Customer App)
+│   ├── merchant-pwa/      # React + Vite (Merchant App)
+│   ├── admin-pwa/         # React + Vite (Standalone Admin Dashboard)
+│   └── api/               # Fastify + TypeScript backend
+├── packages/
+│   ├── ui/                # Shared UI components & Sora design tokens
+│   ├── types/             # Shared TS types (Transaction, Wallet, etc.)
+│   └── api-client/        # Typed fetch wrapper shared by all PWAs
+├── docs/                  # Project specifications & architecture docs
+├── prisma/                # Database schema & migrations
+└── docker-compose.yml     # Local Postgres setup
+```
 
 ---
-*Developed for MS BOS.*
+
+## 📚 Documentation
+
+The system is extensively documented. Please review these before making any structural changes:
+
+1. **[Product Requirements Document](docs/project-req-doc.md)** - Payment modes, funding modes, and the double-entry accounting rules.
+2. **[Project Design Document](docs/project-design-doc.md)** - Visual branding, UI specs, and persona experiences.
+3. **[System Architecture Document](docs/system-architecture-doc.md)** - Data models, core domain flows, and money-safety mechanics.
+4. **[Tech Stack Document](docs/tech-stack-doc.md)** - Development tooling, CI/CD, and hosting strategy.
+
+---
+<div align="center">
+  <i>Built with uncompromising focus on financial correctness and user accessibility.</i>
+</div>
