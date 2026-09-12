@@ -1,4 +1,4 @@
-# ManSula Pay 💳
+# MS Pay 💳
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/status-In%20Development-orange.svg)
@@ -6,7 +6,7 @@
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-339933.svg)
 ![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1.svg)
 
-**ManSula Pay** is a robust, closed-loop digital wallet built directly into the ManSula Business Operating System (BOS). Designed for maximum checkout speed and reliability, it allows consumers to make instant, secure payments at participating merchants **without needing a smartphone, app, or active internet connection** at the point of sale.
+**MS Pay** is a robust, closed-loop digital wallet built directly into the MS Business Operating System (BOS). Designed for maximum checkout speed and reliability, it allows consumers to make instant, secure payments at participating merchants **without needing a smartphone, app, or active internet connection** at the point of sale.
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 🏗️ System Architecture
 
-ManSula Pay utilizes a modern, robust tech stack designed to ensure financial data integrity and offline resilience.
+MS Pay utilizes a modern, robust tech stack designed to ensure financial data integrity and offline resilience.
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
@@ -82,4 +82,4 @@ cd ../backend && npm install
 *   **Encrypted Local Storage:** All queued offline transactions are encrypted on the merchant's device, preventing tampering before synchronization.
 
 ---
-*Developed for ManSula BOS.*
+*Developed for MS BOS.*
