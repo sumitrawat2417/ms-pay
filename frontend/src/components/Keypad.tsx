@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LucideIcon, Delete } from 'lucide-react';
+import { Delete } from 'lucide-react';
 
 interface KeypadProps {
   onPinComplete: (pin: string) => void;
