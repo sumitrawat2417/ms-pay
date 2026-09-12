@@ -1,0 +1,155 @@
+/* ── MS Pay Design Tokens ────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ───────────────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --color-background:      #0F172A;
+  --color-foreground:      #F8FAFC;
+  --color-card:            #1E2740;
+  --color-card-elevated:   #232D45;
+  --color-card-foreground: #F8FAFC;
+  --color-surface-dark:    #1B1730;
+  --color-muted:           #272F42;
+  --color-muted-foreground:#94A3B8;
+  --color-border:          #334155;
+
+  /* Brand */
+  --color-primary:          #FF5D8F;
+  --color-primary-foreground:#FFFFFF;
+  --color-brand-from:       #FF5D8F;
+  --color-brand-mid:        #FF8A3D;
+  --color-brand-to:         #7B2FF7;
+
+  /* Semantic status */
+  --color-success:  #2ECC71;
+  --color-pending:  #FFB020;
+  --color-danger:   #EF4444;
+  --color-info:     #4A90E2;
+}
+
+/* ── Base styles ──────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    @apply bg-background text-foreground font-sora;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  /* Prevent text size inflation on mobile */
+  html { -webkit-text-size-adjust: 100%; }
+
+  /* Remove default button/input styles */
+  button { @apply cursor-pointer; }
+  input, textarea, select { @apply outline-none; }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Brand gradient */
+  .brand-gradient {
+    background: linear-gradient(135deg, var(--color-brand-from), var(--color-brand-mid), var(--color-brand-to));
+  }
+  .brand-gradient-text {
+    background: linear-gradient(135deg, var(--color-brand-from), var(--color-brand-to));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glass card */
+  .glass-card {
+    background: rgba(30, 39, 64, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Numeral (tabular, mono) */
+  .numeral {
+    @apply font-mono font-semibold tabular-nums;
+  }
+
+  /* Safe area padding for mobile */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+  /* Reduce motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ── Component classes ───────────────────────────────────────────────────────── */
+@layer components {
+  /* Page wrapper */
+  .page {
+    @apply min-h-screen flex flex-col bg-background;
+    max-width: 430px;
+    margin: 0 auto;
+  }
+
+  /* Primary CTA button */
+  .btn-primary {
+    @apply w-full py-4 px-6 rounded-2xl font-semibold text-white text-base
+           transition-all duration-200 active:scale-[0.97]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, var(--color-brand-from), var(--color-brand-to));
+    box-shadow: 0 8px 24px rgba(255, 93, 143, 0.35);
+  }
+  .btn-primary:not(:disabled):hover {
+    box-shadow: 0 12px 32px rgba(255, 93, 143, 0.45);
+    transform: translateY(-1px);
+  }
+
+  /* Secondary / ghost button */
+  .btn-secondary {
+    @apply w-full py-4 px-6 rounded-2xl font-semibold text-foreground text-base
+           border border-border bg-card
+           transition-all duration-200 active:scale-[0.97]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply w-full py-4 px-6 rounded-2xl font-semibold text-white text-base
+           bg-danger transition-all duration-200 active:scale-[0.97]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-card rounded-3xl p-5 border border-border;
+  }
+
+  /* Input */
+  .input {
+    @apply w-full bg-muted border border-border rounded-xl px-4 py-3.5
+           text-foreground placeholder:text-muted-foreground
+           focus:border-primary focus:ring-2 focus:ring-primary/20
+           transition-colors duration-200 text-base;
+  }
+
+  /* Status pill */
+  .pill-pending  { @apply bg-pending/20 text-pending text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .pill-approved { @apply bg-success/20 text-success text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .pill-declined { @apply bg-danger/20  text-danger  text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .pill-expired  { @apply bg-muted text-muted-foreground text-xs font-semibold px-2.5 py-1 rounded-full; }
+}

@@ -11,5 +11,8 @@
     "lint": "pnpm -r run lint",
     "test": "pnpm -r run test",
     "clean": "pnpm -r run clean"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "rollup", "vite", "sharp", "@tailwindcss/oxide"]
   }
 }
