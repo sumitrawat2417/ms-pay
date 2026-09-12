@@ -2,29 +2,32 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 
-// Lazy-load all pages for code splitting
+// Direct imports for main tabs to prevent flickering on navigation
+import AppShell from '@/components/AppShell';
+import HomePage from '@/pages/home/HomePage';
+import HistoryPage from '@/pages/history/HistoryPage';
+import ProfilePage from '@/pages/profile/ProfilePage';
+import RequestsPage from '@/pages/requests/RequestsPage';
+
+// Lazy-load all other pages for code splitting
 const SplashPage      = React.lazy(() => import('@/pages/auth/SplashPage'));
 const OnboardingPage  = React.lazy(() => import('@/pages/auth/OnboardingPage'));
 const SignUpPage       = React.lazy(() => import('@/pages/auth/SignUpPage'));
 const SetPasscodePage  = React.lazy(() => import('@/pages/auth/SetPasscodePage'));
 
-const AppShell        = React.lazy(() => import('@/components/AppShell'));
-const HomePage        = React.lazy(() => import('@/pages/home/HomePage'));
 const MyQRPage        = React.lazy(() => import('@/pages/home/MyQRPage'));
 
 const ScannerPage     = React.lazy(() => import('@/pages/pay/ScannerPage'));
 const ConfirmPayPage  = React.lazy(() => import('@/pages/pay/ConfirmPayPage'));
 const PaySuccessPage  = React.lazy(() => import('@/pages/pay/PaySuccessPage'));
 
-const RequestsPage    = React.lazy(() => import('@/pages/requests/RequestsPage'));
 const RequestDetailPage = React.lazy(() => import('@/pages/requests/RequestDetailPage'));
+
 const ChooseAmountPage = React.lazy(() => import('@/pages/recharge/ChooseAmountPage'));
 const PaymentMethodPage = React.lazy(() => import('@/pages/recharge/PaymentMethodPage'));
 const RechargeConfirmPage = React.lazy(() => import('@/pages/recharge/RechargeConfirmPage'));
 
-const HistoryPage       = React.lazy(() => import('@/pages/history/HistoryPage'));
 const TxDetailPage      = React.lazy(() => import('@/pages/history/TxDetailPage'));
-const ProfilePage       = React.lazy(() => import('@/pages/profile/ProfilePage'));
 const PasscodeResetPage = React.lazy(() => import('@/pages/profile/PasscodeResetPage'));
 
 function RequireAuth({ children }: { children: React.ReactNode }) {

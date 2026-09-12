@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { QRCodeSVG } from 'qrcode.react';
+import QRCode from 'react-qr-code';
 import { ChevronLeft, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useEffect } from 'react';
@@ -41,11 +41,10 @@ export default function MyQRPage() {
           </div>
 
           <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm mx-auto w-fit">
-            <QRCodeSVG
+            <QRCode
               value={idQrToken || 'error'}
               size={200}
               level="H"
-              includeMargin={true}
               bgColor="#ffffff"
               fgColor="#000000"
             />
