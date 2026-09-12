@@ -41,3 +41,6 @@ prisma/*.db-journal
 
 # Turborepo
 .turbo/
+
+# Ignored copies
+docs-copy (do not touch)/
