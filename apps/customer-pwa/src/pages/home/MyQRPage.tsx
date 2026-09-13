@@ -33,7 +33,7 @@ export default function MyQRPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-20">
         <div className="w-full max-w-[320px] bg-white rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
           {/* Card branding */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary to-purple-600" />
+          <div className="absolute top-0 left-0 right-0 h-2 brand-gradient" />
           
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold text-slate-900">{consumerName}</h2>

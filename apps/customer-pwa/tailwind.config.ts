@@ -6,7 +6,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sora: ['Sora', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
+        sora: ['Sora', 'sans-serif'], // Keep for fallback if needed
         mono: ['IBM Plex Mono', 'monospace'],
       },
       colors: {
@@ -30,16 +31,21 @@ const config: Config = {
         pending: 'var(--color-pending)',
         danger: 'var(--color-danger)',
         info: 'var(--color-info)',
-        'surface-dark': 'var(--color-surface-dark)',
       },
       borderRadius: {
         '2xl': '20px',
         '3xl': '24px',
         '4xl': '32px',
+        'full': '9999px',
       },
       spacing: {
         '18': '4.5rem',
         '22': '5.5rem',
+      },
+      boxShadow: {
+        'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
+        'glow': '0 8px 24px rgba(254, 106, 73, 0.35)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out forwards',
@@ -57,8 +63,8 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(255, 93, 143, 0)' },
-          '50%': { boxShadow: '0 0 20px 4px rgba(255, 93, 143, 0.35)' },
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(254, 106, 73, 0)' },
+          '50%': { boxShadow: '0 0 20px 4px rgba(254, 106, 73, 0.35)' },
         },
       },
     },
