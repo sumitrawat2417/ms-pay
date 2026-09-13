@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getTransactions } from '@ms-pay/api-client';
-import { History as HistoryIcon, ArrowUpRight, ArrowDownLeft, Calendar } from 'lucide-react';
+import { History as HistoryIcon, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
 export default function HistoryPage() {
   const navigate = useNavigate();

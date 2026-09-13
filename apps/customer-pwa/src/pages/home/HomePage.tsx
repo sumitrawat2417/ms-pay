@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { QrCode, Plus, ArrowRight, ArrowDownLeft, ArrowUpRight, Grid, RefreshCw } from 'lucide-react';
+import { QrCode, Plus, ArrowDownLeft, ArrowUpRight, Grid } from 'lucide-react';
 import { useBalance } from '@/hooks/useBalance';
 import { useAuthStore } from '@/store/authStore';
 
