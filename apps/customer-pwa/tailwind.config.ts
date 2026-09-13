@@ -6,8 +6,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        outfit: ['Outfit', 'sans-serif'],
-        sora: ['Sora', 'sans-serif'], // Keep for fallback if needed
+        sora: ['Sora', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
         mono: ['IBM Plex Mono', 'monospace'],
       },
       colors: {
@@ -44,8 +44,9 @@ const config: Config = {
       },
       boxShadow: {
         'soft': '0 4px 20px rgba(0, 0, 0, 0.05)',
-        'glow': '0 8px 24px rgba(254, 106, 73, 0.35)',
+        'glow': '0 12px 32px rgba(255, 93, 143, 0.25)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        'elevation-high': '0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04)',
       },
       animation: {
         'fade-in': 'fadeIn 0.4s ease-out forwards',
@@ -63,8 +64,8 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 0 0 rgba(254, 106, 73, 0)' },
-          '50%': { boxShadow: '0 0 20px 4px rgba(254, 106, 73, 0.35)' },
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(255, 93, 143, 0)' },
+          '50%': { boxShadow: '0 0 20px 4px rgba(255, 93, 143, 0.35)' },
         },
       },
     },
