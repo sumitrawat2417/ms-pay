@@ -299,3 +299,26 @@ export async function requestPasscodeReset(payload: PasscodeResetPayload): Promi
   await delay(600);
   return { success: true, data: { submitted: true } };
 }
+
+// ─── Merchant Operations ──────────────────────────────────────────────────────
+
+export async function submitMerchantAssistedPay(payload: {
+  consumerIdQrToken: string;
+  consumerPasscode: string;
+  amountMsp: number;
+}): Promise<ApiResponse<{ message: string }>> {
+  // Direct fetch to our local API server we just built
+  try {
+    const res = await fetch('http://localhost:3000/api/transactions/merchant-assisted-pay', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-user-id': 'merchant-001' // Mock merchant ID auth
+      },
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, data: { message: '' }, error: err.message };
+  }
+}

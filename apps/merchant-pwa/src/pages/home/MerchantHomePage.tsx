@@ -77,9 +77,10 @@ export default function MerchantHomePage() {
                   <QrCode size={18} /> Show QR
                 </button>
                 <button 
+                  onClick={() => navigate('/scan-consumer')}
                   className="flex-1 bg-white/10 text-white font-semibold font-inter py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform border border-white/10"
                 >
-                  <ArrowDownLeft size={18} /> Request
+                  <ArrowDownLeft size={18} /> Scan to Charge
                 </button>
               </div>
             </div>

@@ -4,6 +4,8 @@ import { useAuthStore } from '@/store/authStore';
 
 import MerchantHomePage from '@/pages/home/MerchantHomePage';
 import StoreQRPage from '@/pages/qr/StoreQRPage';
+import ScanConsumerPage from '@/pages/pay/ScanConsumerPage';
+import ChargeConsumerPage from '@/pages/pay/ChargeConsumerPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -40,6 +42,8 @@ export function Router() {
           {/* Protected */}
           <Route path="/" element={<RequireAuth><MerchantHomePage /></RequireAuth>} />
           <Route path="/store-qr" element={<RequireAuth><StoreQRPage /></RequireAuth>} />
+          <Route path="/scan-consumer" element={<RequireAuth><ScanConsumerPage /></RequireAuth>} />
+          <Route path="/charge/:consumerToken" element={<RequireAuth><ChargeConsumerPage /></RequireAuth>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

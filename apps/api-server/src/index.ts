@@ -3,11 +3,15 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { db } from './db/index.js';
-import { consumers, wallets, transactions } from './db/schema.js';
+import { consumers, wallets, transactions, merchants } from './db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import type { ApiResponse, WalletBalanceResponse } from '@ms-pay/types';
 
-const app = new Hono();
+type Variables = {
+  userId: string;
+};
+
+const app = new Hono<{ Variables: Variables }>();
 
 app.use('*', logger());
 app.use('*', cors());
@@ -63,7 +67,7 @@ app.get('/api/wallet/balance', async (c) => {
         paymentRequestId: tx.paymentRequestId || undefined,
         fundingSource: tx.fundingSource || undefined,
         note: tx.note || undefined,
-        createdAt: tx.createdAt.toISOString(),
+        createdAt: String(tx.createdAt),
       })),
     };
 
@@ -150,6 +154,63 @@ app.post('/api/transactions/pay', async (c) => {
     await db.update(wallets)
       .set({ balanceMsp: userWallet[0].balanceMsp - amountMsp })
       .where(eq(wallets.consumerId, userId));
+
+    return c.json({ success: true, data: { message: 'Payment successful' } });
+  } catch (err: any) {
+    console.error(err);
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/transactions/merchant-assisted-pay', async (c) => {
+  // In this mode, the merchant is authenticated, and they submit the consumer's token and passcode.
+  const merchantId = c.get('userId');
+  if (!merchantId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+
+  try {
+    const body = await c.req.json();
+    const amountMsp = Number(body.amountMsp);
+    const consumerIdQrToken = body.consumerIdQrToken;
+    const consumerPasscode = body.consumerPasscode; // In a real app, this would be hashed
+
+    if (!amountMsp || amountMsp <= 0 || !consumerIdQrToken || !consumerPasscode) {
+      return c.json({ success: false, data: null, error: 'Invalid payload' }, 400);
+    }
+
+    // 1. Find Consumer by their QR token
+    const consumerRecord = await db.select().from(consumers).where(eq(consumers.idQrToken, consumerIdQrToken)).limit(1);
+    if (!consumerRecord.length) return c.json({ success: false, data: null, error: 'Consumer not found' }, 404);
+    const consumer = consumerRecord[0];
+
+    // MOCK PASSCODE CHECK: We will assume '1234' is the universal correct PIN for now.
+    if (consumerPasscode !== '1234') {
+      return c.json({ success: false, data: null, error: 'Incorrect Passcode' }, 401);
+    }
+
+    // 2. Find merchant to get their name
+    const merchantRecord = await db.select().from(merchants).where(eq(merchants.id, merchantId)).limit(1);
+    const merchantName = merchantRecord.length ? merchantRecord[0].name : 'Unknown Merchant';
+
+    // 3. Check consumer wallet balance
+    const userWallet = await db.select().from(wallets).where(eq(wallets.consumerId, consumer.id)).limit(1);
+    if (!userWallet.length || userWallet[0].balanceMsp < amountMsp) {
+      return c.json({ success: false, data: null, error: 'Insufficient balance' }, 400);
+    }
+
+    // 4. Create transaction
+    await db.insert(transactions).values({
+      type: 'sale_merchant_assisted',
+      amountMsp,
+      consumerId: consumer.id,
+      merchantId: merchantId,
+      merchantName: merchantName,
+      fundingSource: 'self',
+    });
+
+    // 5. Update consumer wallet balance
+    await db.update(wallets)
+      .set({ balanceMsp: userWallet[0].balanceMsp - amountMsp })
+      .where(eq(wallets.consumerId, consumer.id));
 
     return c.json({ success: true, data: { message: 'Payment successful' } });
   } catch (err: any) {
