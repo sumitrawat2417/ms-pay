@@ -1,0 +1,28 @@
+{
+  "name": "@ms-pay/api-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.11.1",
+    "hono": "^4.3.7",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.30.10",
+    "@libsql/client": "^0.6.0",
+    "@ms-pay/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "drizzle-kit": "^0.21.2",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}

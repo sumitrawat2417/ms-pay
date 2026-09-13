@@ -6,3 +6,4 @@ allowBuilds:
   esbuild: true
   workbox-build: true
   sharp: true
+  es5-ext: true
