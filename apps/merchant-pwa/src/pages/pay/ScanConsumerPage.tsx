@@ -13,34 +13,42 @@ export default function ScanConsumerPage() {
     const startScanner = async () => {
       try {
         html5QrCode = new Html5Qrcode("reader");
-        await html5QrCode.start(
-          { facingMode: "environment" },
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
-          },
-          (decodedText) => {
-            // Check if it's a valid consumer payload
-            try {
-              const payload = JSON.parse(decodedText);
-              if (payload.type === 'consumer' && payload.consumerIdQrToken) {
-                // Success! We have the consumer's token
-                html5QrCode.stop().then(() => {
-                  navigate(`/charge/${payload.consumerIdQrToken}`);
-                });
-              } else {
-                setError("Invalid MS Pay Consumer QR");
-              }
-            } catch (e) {
-              setError("Unrecognized QR Code");
+
+        const onScanSuccess = (decodedText: string) => {
+          try {
+            const payload = JSON.parse(decodedText);
+            if (payload.type === 'consumer' && payload.consumerIdQrToken) {
+              html5QrCode.stop().then(() => {
+                navigate(`/charge/${payload.consumerIdQrToken}`);
+              });
+            } else {
+              setError("Invalid MS Pay Consumer QR");
             }
-          },
-          () => {} // Ignore scan errors (happens every frame it doesn't see a QR)
-        );
+          } catch (e) {
+            setError("Unrecognized QR Code");
+          }
+        };
+
+        try {
+          // Try back camera first
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+            onScanSuccess,
+            () => {}
+          );
+        } catch (e) {
+          // Fallback to any camera if environment camera is not found
+          await html5QrCode.start(
+            { facingMode: "user" },
+            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+            onScanSuccess,
+            () => {}
+          );
+        }
       } catch (err: any) {
         console.error("Scanner start failed:", err);
-        setError("Camera permission denied or unavailable");
+        setError("Camera permission denied or no camera found.");
       }
     };
 
@@ -52,6 +60,11 @@ export default function ScanConsumerPage() {
       }
     };
   }, [navigate]);
+
+  // Dev-only helper to mock a scan
+  const handleMockScan = () => {
+    navigate('/charge/qr-consumer-001-demo');
+  };
 
   return (
     <div className="page bg-black text-white flex flex-col h-screen">
@@ -88,6 +101,14 @@ export default function ScanConsumerPage() {
               {error}
             </p>
           )}
+
+          {/* Dev mock button for testing without a real camera/QR */}
+          <button
+            onClick={handleMockScan}
+            className="mt-6 px-4 py-2 bg-white/10 rounded-lg text-sm text-white/80 active:scale-95 transition-transform"
+          >
+            Simulate Scan (Dev)
+          </button>
         </div>
       </div>
     </div>
