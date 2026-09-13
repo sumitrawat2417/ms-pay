@@ -61,8 +61,22 @@ export default function ScannerPage() {
       </header>
 
       {error ? (
-        <div className="flex-1 flex items-center justify-center p-6 text-center">
-          <p className="text-white bg-danger/90 p-4 rounded-xl">{error}</p>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-6">
+          <div className="bg-card p-6 rounded-[32px] border border-border/50 shadow-sm">
+            <div className="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4 text-danger">
+              <Flashlight size={24} />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Camera Unavailable</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              {error} If you are on a desktop without a camera, you can simulate a successful scan to continue testing.
+            </p>
+            <button
+              onClick={() => navigate('/pay/confirm?token=mock_merchant_token', { replace: true })}
+              className="btn-primary w-full"
+            >
+              Simulate Scan (Test)
+            </button>
+          </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col">
