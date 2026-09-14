@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { db } from './db/index.js';
-import { consumers, wallets, transactions, merchants } from './db/schema.js';
+import { consumers, wallets, transactions, merchants, payment_requests } from './db/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import type { ApiResponse, WalletBalanceResponse } from '@ms-pay/types';
 
@@ -217,6 +217,113 @@ app.post('/api/transactions/merchant-assisted-pay', async (c) => {
     console.error(err);
     return c.json({ success: false, data: null, error: err.message }, 500);
   }
+});
+
+app.get('/api/transactions', async (c) => {
+  const userId = c.get('userId');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  try {
+    const txData = await db.select().from(transactions).where(eq(transactions.consumerId, userId)).orderBy(desc(transactions.createdAt)).limit(50);
+    const formatted = txData.map(tx => ({
+      ...tx,
+      createdAt: String(tx.createdAt),
+      amountMsp: Number(tx.amountMsp)
+    }));
+    return c.json({ success: true, data: formatted });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.get('/api/resolve-qr/:token', async (c) => {
+  const token = c.req.param('token');
+  try {
+    const m = await db.select().from(merchants).where(eq(merchants.storeQrToken, token)).limit(1);
+    if (!m.length) return c.json({ success: false, data: null, error: 'Merchant not found' }, 404);
+    return c.json({ success: true, data: m[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.get('/api/requests', async (c) => {
+  const userId = c.get('userId');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  try {
+    const reqs = await db.select().from(payment_requests).where(eq(payment_requests.consumerRef, userId)).orderBy(desc(payment_requests.createdAt));
+    return c.json({ success: true, data: reqs });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/requests/:id/approve', async (c) => {
+  const userId = c.get('userId');
+  const reqId = c.req.param('id');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  
+  try {
+    const reqs = await db.select().from(payment_requests).where(eq(payment_requests.id, reqId)).limit(1);
+    if (!reqs.length || reqs[0].status !== 'pending' || reqs[0].consumerRef !== userId) {
+      return c.json({ success: false, data: null, error: 'Request not found or invalid' }, 404);
+    }
+    
+    const r = reqs[0];
+    const userWallet = await db.select().from(wallets).where(eq(wallets.consumerId, userId)).limit(1);
+    if (!userWallet.length || userWallet[0].balanceMsp < r.amountMsp) {
+      return c.json({ success: false, data: null, error: 'Insufficient balance' }, 400);
+    }
+
+    // 1. Mark request approved
+    await db.update(payment_requests).set({ status: 'approved', approvedAt: String(new Date()) }).where(eq(payment_requests.id, reqId));
+    
+    // 2. Create Tx
+    await db.insert(transactions).values({
+      type: 'sale_request_approved',
+      amountMsp: r.amountMsp,
+      consumerId: userId,
+      merchantId: r.merchantId,
+      merchantName: r.merchantName,
+      paymentRequestId: r.id,
+      fundingSource: 'self'
+    });
+
+    // 3. Update Wallet
+    await db.update(wallets).set({ balanceMsp: userWallet[0].balanceMsp - r.amountMsp }).where(eq(wallets.consumerId, userId));
+    
+    return c.json({ success: true, data: { message: 'Approved' } });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/requests/:id/decline', async (c) => {
+  const userId = c.get('userId');
+  const reqId = c.req.param('id');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  
+  try {
+    await db.update(payment_requests).set({ status: 'declined' }).where(eq(payment_requests.id, reqId));
+    return c.json({ success: true, data: { message: 'Declined' } });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.get('/api/customer/profile', async (c) => {
+  const userId = c.get('userId');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  try {
+    const user = await db.select().from(consumers).where(eq(consumers.id, userId)).limit(1);
+    if (!user.length) return c.json({ success: false, data: null, error: 'Not found' }, 404);
+    return c.json({ success: true, data: user[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/customer/passcode-reset', async (c) => {
+  return c.json({ success: true, data: { submitted: true } });
 });
 
 const port = 3000;

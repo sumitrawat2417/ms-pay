@@ -37,3 +37,16 @@ export const transactions = sqliteTable('transactions', {
   note: text('note'),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
+
+export const payment_requests = sqliteTable('payment_requests', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  merchantId: text('merchant_id').references(() => merchants.id).notNull(),
+  merchantName: text('merchant_name').notNull(),
+  consumerRef: text('consumer_ref').notNull(), // QR Token or ID
+  amountMsp: real('amount_msp').notNull(),
+  status: text('status').$type<PaymentRequestStatus>().notNull().default('pending'),
+  linkedTransactionId: text('linked_transaction_id'),
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  expiresAt: text('expires_at').notNull(),
+  approvedAt: text('approved_at'),
+});
