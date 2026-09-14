@@ -1,0 +1,13 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1789380797326,
+      "tag": "0000_flawless_william_stryker",
+      "breakpoints": true
+    }
+  ]
+}

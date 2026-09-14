@@ -13,27 +13,39 @@ export default function ScannerPage() {
     const html5QrCode = new Html5Qrcode('qr-reader');
     scannerRef.current = html5QrCode;
 
-    html5QrCode.start(
-      { facingMode: 'environment' },
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1,
-      },
-      (decodedText) => {
-        // Success callback
-        html5QrCode.stop().then(() => {
-          // Navigate to confirm pay with the scanned merchant token
-          navigate(`/pay/confirm?token=${encodeURIComponent(decodedText)}`, { replace: true });
-        });
-      },
-      () => {
-        // Parse error, ignore normally unless it's a real camera error
+    const startScanner = async () => {
+      try {
+        try {
+          await html5QrCode.start(
+            { facingMode: 'environment' },
+            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1 },
+            (decodedText) => {
+              html5QrCode.stop().then(() => {
+                navigate(`/pay/confirm?token=${encodeURIComponent(decodedText)}`, { replace: true });
+              });
+            },
+            () => {}
+          );
+        } catch (e) {
+          // Fallback to any camera
+          await html5QrCode.start(
+            { facingMode: 'user' },
+            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1 },
+            (decodedText) => {
+              html5QrCode.stop().then(() => {
+                navigate(`/pay/confirm?token=${encodeURIComponent(decodedText)}`, { replace: true });
+              });
+            },
+            () => {}
+          );
+        }
+      } catch (err) {
+        console.error('Failed to start scanner', err);
+        setError('Could not access camera. Please check permissions.');
       }
-    ).catch((err) => {
-      console.error('Failed to start scanner', err);
-      setError('Could not access camera. Please check permissions.');
-    });
+    };
+
+    startScanner();
 
     return () => {
       if (html5QrCode.isScanning) {
@@ -71,7 +83,7 @@ export default function ScannerPage() {
               {error} If you are on a desktop without a camera, you can simulate a successful scan to continue testing.
             </p>
             <button
-              onClick={() => navigate('/pay/confirm?token=mock_merchant_token', { replace: true })}
+              onClick={() => navigate('/pay/confirm?token=qr-store-001', { replace: true })}
               className="btn-primary w-full"
             >
               Simulate Scan (Test)
