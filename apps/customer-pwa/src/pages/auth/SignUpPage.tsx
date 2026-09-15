@@ -5,22 +5,28 @@ import { User, ChevronRight } from 'lucide-react';
 import { registerConsumer, setAuthUser } from '@ms-pay/api-client';
 
 export default function SignUpPage() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
 
   const handleContinue = async () => {
-    if (!name.trim()) return;
+    if (!firstName.trim() || !lastName.trim() || !phone.trim()) {
+      setError('Please fill in all fields');
+      return;
+    }
     setLoading(true);
     setError('');
     
     try {
-      const res = await registerConsumer(name.trim());
+      const res = await registerConsumer(firstName.trim(), lastName.trim(), phone.trim());
       if (res.success && res.data) {
         setAuthUser(res.data.id);
-        login(res.data.id, res.data.name, res.data.idQrToken);
+        login(res.data.id, `${res.data.firstName} ${res.data.lastName}`, res.data.idQrToken);
         navigate('/passcode/set');
       } else {
         setError(res.error || 'Registration failed');
@@ -31,6 +37,8 @@ export default function SignUpPage() {
       setLoading(false);
     }
   };
+
+  const isFormValid = firstName.trim() && lastName.trim() && phone.trim();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#050505] relative overflow-hidden">
@@ -48,28 +56,52 @@ export default function SignUpPage() {
         </div>
         <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm">Create your account</h1>
         <p className="text-white/60 mt-3 text-[17px] leading-relaxed font-medium">
-          Enter your name to get started. Your unique wallet ID will be generated instantly.
+          Enter your details to get started. Your unique wallet ID will be generated instantly.
         </p>
       </div>
 
       {/* Form */}
-      <div className="px-6 flex-1 relative z-10 animate-slide-up mt-4">
+      <div className="px-6 flex-1 relative z-10 animate-slide-up mt-4 flex flex-col gap-4">
+        
+        <div className="flex gap-4">
+          <div className="relative group flex-1">
+            <input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-primary/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
+              autoFocus
+            />
+            <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
+          </div>
+          
+          <div className="relative group flex-1">
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-primary/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
+            />
+            <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
+          </div>
+        </div>
+
         <div className="relative group">
           <input
-            id="name"
-            type="text"
-            placeholder="e.g. Sumit Rawat"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleContinue()}
+            type="tel"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && isFormValid && handleContinue()}
             className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-primary/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
-            autoFocus
-            autoComplete="name"
           />
           <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
         </div>
-        {error && <p className="text-danger text-sm mt-3 px-2 font-medium">{error}</p>}
-        <p className="text-sm text-white/40 mt-4 px-2">
+
+        {error && <p className="text-danger text-sm mt-2 px-2 font-medium">{error}</p>}
+        <p className="text-sm text-white/40 mt-2 px-2">
           Your name appears on your wallet ID card shown to merchants.
         </p>
       </div>
@@ -79,8 +111,8 @@ export default function SignUpPage() {
         <button
           id="signup-continue"
           onClick={handleContinue}
-          disabled={!name.trim() || loading}
-          className="btn-primary flex items-center justify-center gap-2 relative overflow-hidden group mb-6"
+          disabled={!isFormValid || loading}
+          className="btn-primary flex items-center justify-center gap-2 relative overflow-hidden group mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <div className="w-6 h-6 rounded-full border-2 border-white/30 border-t-white animate-spin relative z-10" />

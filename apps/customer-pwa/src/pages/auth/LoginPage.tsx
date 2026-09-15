@@ -5,28 +5,26 @@ import { LogIn, ChevronRight } from 'lucide-react';
 import { loginConsumer, setAuthUser } from '@ms-pay/api-client';
 
 export default function LoginPage() {
-  const [token, setToken] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
 
   const handleContinue = async () => {
-    if (!token.trim()) return;
+    if (!phone.trim()) return;
     setLoading(true);
     setError('');
     
     try {
-      const res = await loginConsumer(token.trim());
+      const res = await loginConsumer(phone.trim());
       if (res.success && res.data) {
         setAuthUser(res.data.id);
-        login(res.data.id, res.data.name, res.data.idQrToken);
-        // Assuming they already set a passcode if they have an account, but we don't have a check for that right now.
-        // For now, we will route them to passcode set or we can just send them home.
-        // Actually, we should send them to confirm passcode or dashboard. We'll send to home for simplicity, or /passcode/set to reset it locally.
-        navigate('/');
+        login(res.data.id, `${res.data.firstName} ${res.data.lastName}`, res.data.idQrToken);
+        // Assuming they already set a passcode if they have an account
+        navigate('/home');
       } else {
-        setError(res.error || 'Login failed. Invalid token.');
+        setError(res.error || 'Login failed. Invalid phone number.');
       }
     } catch (err: any) {
       setError(err.message || 'Network error');
@@ -51,7 +49,7 @@ export default function LoginPage() {
         </div>
         <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm">Log in to MS Pay</h1>
         <p className="text-white/60 mt-3 text-[17px] leading-relaxed font-medium">
-          Enter your Wallet Token (e.g. qr-cus-xxx) to access your account.
+          Enter your registered phone number to access your account.
         </p>
       </div>
 
@@ -59,17 +57,14 @@ export default function LoginPage() {
       <div className="px-6 flex-1 relative z-10 animate-slide-up mt-4">
         <div className="relative group">
           <input
-            id="token"
-            type="text"
-            placeholder="qr-cus-..."
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
+            id="phone"
+            type="tel"
+            placeholder="Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleContinue()}
             className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-[#7B2FF7]/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
             autoFocus
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="none"
           />
           <div className="absolute inset-0 rounded-2xl bg-[#7B2FF7]/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
         </div>
@@ -81,7 +76,7 @@ export default function LoginPage() {
         <button
           id="login-continue"
           onClick={handleContinue}
-          disabled={!token.trim() || loading}
+          disabled={!phone.trim() || loading}
           className="w-full bg-[#7B2FF7] text-white rounded-2xl h-[60px] font-semibold text-lg hover:bg-[#6820df] transition-colors flex items-center justify-center gap-2 relative overflow-hidden group mb-6 shadow-[0_0_30px_rgba(123,47,247,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (

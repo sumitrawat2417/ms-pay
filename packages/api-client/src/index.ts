@@ -41,17 +41,17 @@ async function fetchApi<T>(path: string, init?: RequestInit): Promise<ApiRespons
 
 // ─── Authentication ───────────────────────────────────────────────────────────
 
-export async function registerConsumer(name: string): Promise<ApiResponse<Consumer>> {
+export async function registerConsumer(firstName: string, lastName: string, phone: string): Promise<ApiResponse<Consumer>> {
   return fetchApi<Consumer>('/api/customer/register', {
     method: 'POST',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ firstName, lastName, phone }),
   });
 }
 
-export async function loginConsumer(token: string): Promise<ApiResponse<Consumer>> {
+export async function loginConsumer(phone: string): Promise<ApiResponse<Consumer>> {
   return fetchApi<Consumer>('/api/customer/login', {
     method: 'POST',
-    body: JSON.stringify({ token }),
+    body: JSON.stringify({ phone }),
   });
 }
 

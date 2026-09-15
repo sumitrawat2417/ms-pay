@@ -324,15 +324,24 @@ app.get('/api/customer/profile', async (c) => {
 
 app.post('/api/customer/register', async (c) => {
   try {
-    const { name } = await c.req.json();
-    if (!name) return c.json({ success: false, data: null, error: 'Name required' }, 400);
+    const { firstName, lastName, phone } = await c.req.json();
+    if (!firstName || !lastName || !phone) return c.json({ success: false, data: null, error: 'First name, last name, and phone are required' }, 400);
 
     const consumerId = crypto.randomUUID();
     const idQrToken = `qr-cus-${consumerId.slice(0, 8)}`;
     
+    // SQLite doesn't have a specific unique constraint error code object structure we can cleanly catch in standard try/catch without checking the message
+    // So we'll first check if the phone exists to give a better error message.
+    const existing = await db.select().from(consumers).where(eq(consumers.phone, phone)).limit(1);
+    if (existing.length) {
+      return c.json({ success: false, data: null, error: 'Phone number already registered' }, 400);
+    }
+
     await db.insert(consumers).values({
       id: consumerId,
-      name,
+      firstName,
+      lastName,
+      phone,
       idQrToken,
     });
 
@@ -350,11 +359,11 @@ app.post('/api/customer/register', async (c) => {
 
 app.post('/api/customer/login', async (c) => {
   try {
-    const { token } = await c.req.json();
-    if (!token) return c.json({ success: false, data: null, error: 'Token required' }, 400);
+    const { phone } = await c.req.json();
+    if (!phone) return c.json({ success: false, data: null, error: 'Phone number required' }, 400);
 
-    const user = await db.select().from(consumers).where(eq(consumers.idQrToken, token)).limit(1);
-    if (!user.length) return c.json({ success: false, data: null, error: 'Invalid Token' }, 401);
+    const user = await db.select().from(consumers).where(eq(consumers.phone, phone)).limit(1);
+    if (!user.length) return c.json({ success: false, data: null, error: 'Invalid Phone Number' }, 401);
 
     return c.json({ success: true, data: user[0] });
   } catch (err: any) {

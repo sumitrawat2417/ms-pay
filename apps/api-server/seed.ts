@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import process from 'node:process';
 
 async function seed() {
-  const client = createClient({ url: 'file:sqlite.db' });
+  const client = createClient({ url: 'file:sqlite2.db' });
   
   // 1. Run migrations
   const sqlContent = readFileSync(join(process.cwd(), 'drizzle/0000_flawless_william_stryker.sql'), 'utf-8');
@@ -26,8 +26,8 @@ async function seed() {
   
   try {
     await client.execute(`
-      INSERT INTO consumers (id, name, id_qr_token) 
-      VALUES ('consumer-001', 'Sumit Rawat', 'qr-consumer-001-demo')
+      INSERT INTO consumers (id, first_name, last_name, phone, id_qr_token) 
+      VALUES ('consumer-001', 'Sumit', 'Rawat', '9876543210', 'qr-consumer-001-demo')
       ON CONFLICT DO NOTHING;
     `);
 

@@ -4,7 +4,9 @@ import type { TransactionType, PaymentRequestStatus, FundingSource } from '@ms-p
 
 export const consumers = sqliteTable('consumers', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  phone: text('phone').notNull().unique(),
   idQrToken: text('id_qr_token').notNull().unique(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });

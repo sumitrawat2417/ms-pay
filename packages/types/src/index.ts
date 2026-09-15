@@ -20,7 +20,9 @@ export type FundingSource = 'self' | 'admin' | 'merchant_cashin' | 'merchant_adv
 
 export interface Consumer {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
   idQrToken: string;
   createdAt: string; // ISO 8601
 }
