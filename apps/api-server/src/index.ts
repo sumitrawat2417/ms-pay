@@ -146,7 +146,7 @@ app.post('/api/transactions/pay', async (c) => {
       amountMsp,
       consumerId: userId,
       merchantId: merchant[0].id,
-      merchantName: merchant[0].name,
+      merchantName: merchant[0].storeName,
       fundingSource: 'self',
     });
 
@@ -189,7 +189,7 @@ app.post('/api/transactions/merchant-assisted-pay', async (c) => {
 
     // 2. Find merchant to get their name
     const merchantRecord = await db.select().from(merchants).where(eq(merchants.id, merchantId)).limit(1);
-    const merchantName = merchantRecord.length ? merchantRecord[0].name : 'Unknown Merchant';
+    const merchantName = merchantRecord.length ? merchantRecord[0].storeName : 'Unknown Merchant';
 
     // 3. Check consumer wallet balance
     const userWallet = await db.select().from(wallets).where(eq(wallets.consumerId, consumer.id)).limit(1);
