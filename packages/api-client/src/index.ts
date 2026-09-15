@@ -55,6 +55,20 @@ export async function loginConsumer(phone: string): Promise<ApiResponse<Consumer
   });
 }
 
+export async function registerMerchant(ownerName: string, storeName: string, phone: string, category?: string): Promise<ApiResponse<Merchant>> {
+  return fetchApi<Merchant>('/api/merchant/register', {
+    method: 'POST',
+    body: JSON.stringify({ ownerName, storeName, phone, category }),
+  });
+}
+
+export async function loginMerchant(phone: string): Promise<ApiResponse<Merchant>> {
+  return fetchApi<Merchant>('/api/merchant/login', {
+    method: 'POST',
+    body: JSON.stringify({ phone }),
+  });
+}
+
 // ─── Wallet / Balance ─────────────────────────────────────────────────────────
 
 export async function getWalletBalance(): Promise<ApiResponse<WalletBalanceResponse>> {

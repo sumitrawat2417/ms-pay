@@ -11,7 +11,7 @@ const mockTransactions = [
 ];
 
 export default function MerchantHomePage() {
-  const merchantName = useAuthStore((s) => s.merchantName) || 'Store Owner';
+  const merchantName = useAuthStore((s) => s.storeName) || 'Store Owner';
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
 

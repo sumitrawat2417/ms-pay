@@ -29,7 +29,9 @@ export interface Consumer {
 
 export interface Merchant {
   id: string;
-  name: string;
+  ownerName: string;
+  storeName: string;
+  phone: string;
   storeQrToken: string;
   category?: string;
 }

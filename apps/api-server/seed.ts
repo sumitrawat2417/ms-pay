@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import process from 'node:process';
 
 async function seed() {
-  const client = createClient({ url: 'file:sqlite2.db' });
+  const client = createClient({ url: 'file:sqlite3.db' });
   
   // 1. Run migrations
   const sqlContent = readFileSync(join(process.cwd(), 'drizzle/0000_flawless_william_stryker.sql'), 'utf-8');
@@ -38,11 +38,11 @@ async function seed() {
     `);
 
     await client.execute(`
-      INSERT INTO merchants (id, name, store_qr_token, category) 
+      INSERT INTO merchants (id, owner_name, store_name, phone, category, store_qr_token) 
       VALUES 
-        ('merchant-001', 'The Green Leaf Café', 'qr-store-001', 'Food & Beverage'),
-        ('merchant-002', 'Urban Threads', 'qr-store-002', 'Clothing'),
-        ('merchant-003', 'TechZone Electronics', 'qr-store-003', 'Electronics')
+        ('merchant-001', 'Sula', 'The Green Leaf Café', '9876543211', 'Food & Beverage', 'qr-store-001'),
+        ('merchant-002', 'Urban Owner', 'Urban Threads', '9876543212', 'Clothing', 'qr-store-002'),
+        ('merchant-003', 'Tech Owner', 'TechZone Electronics', '9876543213', 'Electronics', 'qr-store-003')
       ON CONFLICT DO NOTHING;
     `);
 

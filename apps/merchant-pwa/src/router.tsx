@@ -2,6 +2,12 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 
+// Auth Pages
+const SplashPage = React.lazy(() => import('@/pages/auth/SplashPage'));
+const SignUpPage = React.lazy(() => import('@/pages/auth/SignUpPage'));
+const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'));
+
+// Main Pages
 import MerchantHomePage from '@/pages/home/MerchantHomePage';
 import StoreQRPage from '@/pages/qr/StoreQRPage';
 import ScanConsumerPage from '@/pages/pay/ScanConsumerPage';
@@ -9,15 +15,8 @@ import ChargeConsumerPage from '@/pages/pay/ChargeConsumerPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const setMerchantName = useAuthStore((s) => s.setMerchantName);
   
-  React.useEffect(() => {
-    if (!isAuthenticated) {
-      setMerchantName("Sula's Coffee Shop");
-    }
-  }, [isAuthenticated, setMerchantName]);
-
-  // if (!isAuthenticated) return <Navigate to="/splash" replace />;
+  if (!isAuthenticated) return <Navigate to="/splash" replace />;
   return <>{children}</>;
 }
 
@@ -39,6 +38,11 @@ export function Router() {
     >
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          {/* Auth */}
+          <Route path="/splash" element={<SplashPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/login" element={<LoginPage />} />
+
           {/* Protected */}
           <Route path="/" element={<RequireAuth><MerchantHomePage /></RequireAuth>} />
           <Route path="/store-qr" element={<RequireAuth><StoreQRPage /></RequireAuth>} />

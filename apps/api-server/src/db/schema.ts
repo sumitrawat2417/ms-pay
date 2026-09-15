@@ -13,7 +13,9 @@ export const consumers = sqliteTable('consumers', {
 
 export const merchants = sqliteTable('merchants', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
+  ownerName: text('owner_name').notNull(),
+  storeName: text('store_name').notNull(),
+  phone: text('phone').notNull().unique(),
   storeQrToken: text('store_qr_token').notNull().unique(),
   category: text('category'),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),

@@ -374,7 +374,48 @@ app.post('/api/customer/login', async (c) => {
 app.post('/api/customer/passcode-reset', async (c) => {
   return c.json({ success: true, data: { submitted: true } });
 });
+app.post('/api/merchant/register', async (c) => {
+  try {
+    const { ownerName, storeName, phone, category } = await c.req.json();
+    if (!ownerName || !storeName || !phone) return c.json({ success: false, data: null, error: 'Owner name, store name, and phone are required' }, 400);
 
+    const merchantId = crypto.randomUUID();
+    const storeQrToken = `qr-merch-${merchantId.slice(0, 8)}`;
+    
+    const existing = await db.select().from(merchants).where(eq(merchants.phone, phone)).limit(1);
+    if (existing.length) {
+      return c.json({ success: false, data: null, error: 'Phone number already registered' }, 400);
+    }
+
+    await db.insert(merchants).values({
+      id: merchantId,
+      ownerName,
+      storeName,
+      phone,
+      category: category || 'General',
+      storeQrToken,
+    });
+
+    const user = await db.select().from(merchants).where(eq(merchants.id, merchantId)).limit(1);
+    return c.json({ success: true, data: user[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/merchant/login', async (c) => {
+  try {
+    const { phone } = await c.req.json();
+    if (!phone) return c.json({ success: false, data: null, error: 'Phone number required' }, 400);
+
+    const user = await db.select().from(merchants).where(eq(merchants.phone, phone)).limit(1);
+    if (!user.length) return c.json({ success: false, data: null, error: 'Invalid Phone Number' }, 401);
+
+    return c.json({ success: true, data: user[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
 const port = 3000;
 console.log(`Server is running on http://localhost:${port}`);
 

@@ -5,8 +5,8 @@ import { QRCodeSVG } from 'qrcode.react'; // We need to install this
 
 export default function StoreQRPage() {
   const navigate = useNavigate();
-  const merchantName = useAuthStore((s) => s.merchantName) || 'Store Owner';
-  const qrToken = useAuthStore((s) => s.idQrToken) || 'merchant-demo-token';
+  const merchantName = useAuthStore((s) => s.storeName) || 'Store Owner';
+  const qrToken = useAuthStore((s) => s.storeQrToken) || 'merchant-demo-token';
 
   // Construct standard payment request intent payload
   const qrPayload = JSON.stringify({
