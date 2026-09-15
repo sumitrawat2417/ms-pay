@@ -12,39 +12,36 @@ export default function ScanConsumerPage() {
 
     const startScanner = async () => {
       try {
-        html5QrCode = new Html5Qrcode("reader");
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length > 0) {
+          html5QrCode = new Html5Qrcode("reader");
 
-        const onScanSuccess = (decodedText: string) => {
-          try {
-            const payload = JSON.parse(decodedText);
-            if (payload.type === 'consumer' && payload.consumerIdQrToken) {
-              html5QrCode.stop().then(() => {
-                navigate(`/charge/${payload.consumerIdQrToken}`);
-              });
-            } else {
-              setError("Invalid MS Pay Consumer QR");
+          const onScanSuccess = (decodedText: string) => {
+            try {
+              const payload = JSON.parse(decodedText);
+              if (payload.type === 'consumer' && payload.consumerIdQrToken) {
+                html5QrCode.stop().then(() => {
+                  navigate(`/charge/${payload.consumerIdQrToken}`);
+                });
+              } else {
+                setError("Invalid MS Pay Consumer QR");
+              }
+            } catch (e) {
+              setError("Unrecognized QR Code");
             }
-          } catch (e) {
-            setError("Unrecognized QR Code");
-          }
-        };
+          };
 
-        try {
-          // Try back camera first
+          // Use the last camera (usually the back camera on phones) or the first available
+          const cameraId = cameras.length > 1 ? cameras[cameras.length - 1].id : cameras[0].id;
+
           await html5QrCode.start(
-            { facingMode: "environment" },
+            cameraId,
             { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
             onScanSuccess,
             () => {}
           );
-        } catch (e) {
-          // Fallback to any camera if environment camera is not found
-          await html5QrCode.start(
-            { facingMode: "user" },
-            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
-            onScanSuccess,
-            () => {}
-          );
+        } else {
+          setError('No cameras found on this device.');
         }
       } catch (err: any) {
         console.error("Scanner start failed:", err);

@@ -15,9 +15,13 @@ export default function ScannerPage() {
 
     const startScanner = async () => {
       try {
-        try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length > 0) {
+          // Use the last camera (usually the back camera on phones) or the first available
+          const cameraId = cameras.length > 1 ? cameras[cameras.length - 1].id : cameras[0].id;
+          
           await html5QrCode.start(
-            { facingMode: 'environment' },
+            cameraId,
             { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1 },
             (decodedText) => {
               html5QrCode.stop().then(() => {
@@ -26,18 +30,8 @@ export default function ScannerPage() {
             },
             () => {}
           );
-        } catch (e) {
-          // Fallback to any camera
-          await html5QrCode.start(
-            { facingMode: 'user' },
-            { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1 },
-            (decodedText) => {
-              html5QrCode.stop().then(() => {
-                navigate(`/pay/confirm?token=${encodeURIComponent(decodedText)}`, { replace: true });
-              });
-            },
-            () => {}
-          );
+        } else {
+          setError('No cameras found on this device.');
         }
       } catch (err) {
         console.error('Failed to start scanner', err);
