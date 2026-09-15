@@ -1,13 +1,14 @@
 import { createClient } from '@libsql/client';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import process from 'node:process';
 
 async function seed() {
   const client = createClient({ url: 'file:sqlite.db' });
   
   // 1. Run migrations
   const sqlContent = readFileSync(join(process.cwd(), 'drizzle/0000_flawless_william_stryker.sql'), 'utf-8');
-  const statements = sqlContent.split('--> statement-breakpoint').map(s => s.trim()).filter(s => s.length > 0);
+  const statements = sqlContent.split('--> statement-breakpoint').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
   
   console.log('Running migrations...');
   for (const stmt of statements) {
