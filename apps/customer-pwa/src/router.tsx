@@ -13,6 +13,7 @@ import RequestsPage from '@/pages/requests/RequestsPage';
 const SplashPage      = React.lazy(() => import('@/pages/auth/SplashPage'));
 const OnboardingPage  = React.lazy(() => import('@/pages/auth/OnboardingPage'));
 const SignUpPage       = React.lazy(() => import('@/pages/auth/SignUpPage'));
+const LoginPage       = React.lazy(() => import('@/pages/auth/LoginPage'));
 const SetPasscodePage  = React.lazy(() => import('@/pages/auth/SetPasscodePage'));
 
 const MyQRPage        = React.lazy(() => import('@/pages/home/MyQRPage'));
@@ -58,6 +59,7 @@ export function Router() {
           <Route path="/splash"   element={<SplashPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/signup"   element={<SignUpPage />} />
+          <Route path="/login"    element={<LoginPage />} />
           <Route path="/passcode/set" element={<SetPasscodePage />} />
 
           {/* Protected — App shell with bottom nav */}

@@ -322,6 +322,46 @@ app.get('/api/customer/profile', async (c) => {
   }
 });
 
+app.post('/api/customer/register', async (c) => {
+  try {
+    const { name } = await c.req.json();
+    if (!name) return c.json({ success: false, data: null, error: 'Name required' }, 400);
+
+    const consumerId = crypto.randomUUID();
+    const idQrToken = `qr-cus-${consumerId.slice(0, 8)}`;
+    
+    await db.insert(consumers).values({
+      id: consumerId,
+      name,
+      idQrToken,
+    });
+
+    await db.insert(wallets).values({
+      consumerId,
+      balanceMsp: 0,
+    });
+
+    const user = await db.select().from(consumers).where(eq(consumers.id, consumerId)).limit(1);
+    return c.json({ success: true, data: user[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/customer/login', async (c) => {
+  try {
+    const { token } = await c.req.json();
+    if (!token) return c.json({ success: false, data: null, error: 'Token required' }, 400);
+
+    const user = await db.select().from(consumers).where(eq(consumers.idQrToken, token)).limit(1);
+    if (!user.length) return c.json({ success: false, data: null, error: 'Invalid Token' }, 401);
+
+    return c.json({ success: true, data: user[0] });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
 app.post('/api/customer/passcode-reset', async (c) => {
   return c.json({ success: true, data: { submitted: true } });
 });

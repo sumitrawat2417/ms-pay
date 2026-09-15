@@ -15,24 +15,44 @@ import type {
 // In production, this would be set via environment variables.
 const BASE_URL = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:3000';
 
+let currentUserId = 'consumer-001';
+
+export function setAuthUser(userId: string) {
+  currentUserId = userId;
+}
+
 async function fetchApi<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
   try {
     const res = await fetch(`${BASE_URL}${path}`, {
       headers: {
         'Content-Type': 'application/json',
-        // In a real app, this would be a secure auth token. We mock it for the demo.
-        'x-user-id': 'consumer-001',
+        'x-user-id': currentUserId,
         ...init?.headers,
       },
       ...init,
     });
     
-    // We expect the backend to always return an ApiResponse format
     const data = await res.json();
     return data as ApiResponse<T>;
   } catch (err: any) {
     return { success: false, data: null as any, error: err.message };
   }
+}
+
+// ─── Authentication ───────────────────────────────────────────────────────────
+
+export async function registerConsumer(name: string): Promise<ApiResponse<Consumer>> {
+  return fetchApi<Consumer>('/api/customer/register', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function loginConsumer(token: string): Promise<ApiResponse<Consumer>> {
+  return fetchApi<Consumer>('/api/customer/login', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
 }
 
 // ─── Wallet / Balance ─────────────────────────────────────────────────────────

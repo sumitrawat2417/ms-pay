@@ -1,29 +1,32 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { User, ChevronRight } from 'lucide-react';
-import { registerConsumer, setAuthUser } from '@ms-pay/api-client';
+import { LogIn, ChevronRight } from 'lucide-react';
+import { loginConsumer, setAuthUser } from '@ms-pay/api-client';
 
-export default function SignUpPage() {
-  const [name, setName] = useState('');
+export default function LoginPage() {
+  const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
 
   const handleContinue = async () => {
-    if (!name.trim()) return;
+    if (!token.trim()) return;
     setLoading(true);
     setError('');
     
     try {
-      const res = await registerConsumer(name.trim());
+      const res = await loginConsumer(token.trim());
       if (res.success && res.data) {
         setAuthUser(res.data.id);
         login(res.data.id, res.data.name, res.data.idQrToken);
-        navigate('/passcode/set');
+        // Assuming they already set a passcode if they have an account, but we don't have a check for that right now.
+        // For now, we will route them to passcode set or we can just send them home.
+        // Actually, we should send them to confirm passcode or dashboard. We'll send to home for simplicity, or /passcode/set to reset it locally.
+        navigate('/');
       } else {
-        setError(res.error || 'Registration failed');
+        setError(res.error || 'Login failed. Invalid token.');
       }
     } catch (err: any) {
       setError(err.message || 'Network error');
@@ -35,20 +38,20 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#050505] relative overflow-hidden">
       {/* Background ambient glow */}
-      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-primary/20 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#7B2FF7]/20 blur-[120px] pointer-events-none" />
       
       {/* Noise overlay */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml;utf8,<svg viewBox=\\"0 0 200 200\\" xmlns=\\"http://www.w3.org/2000/svg\\"><filter id=\\"noise\\"><feTurbulence type=\\"fractalNoise\\" baseFrequency=\\"0.85\\" numOctaves=\\"3\\" stitchTiles=\\"stitch\\"/></filter><rect width=\\"100%\\" height=\\"100%\\" filter=\\"url(%23noise)\\"/></svg>")' }} />
 
       {/* Header */}
       <div className="px-6 pt-20 pb-8 relative z-10 animate-fade-in">
-        <div className="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(255,93,143,0.15)] relative overflow-hidden">
+        <div className="w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(123,47,247,0.15)] relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30" />
-          <User size={26} className="text-white relative z-10 drop-shadow-md" />
+          <LogIn size={26} className="text-white relative z-10 drop-shadow-md" />
         </div>
-        <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm">Create your account</h1>
+        <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-sm">Log in to MS Pay</h1>
         <p className="text-white/60 mt-3 text-[17px] leading-relaxed font-medium">
-          Enter your name to get started. Your unique wallet ID will be generated instantly.
+          Enter your Wallet Token (e.g. qr-cus-xxx) to access your account.
         </p>
       </div>
 
@@ -56,37 +59,36 @@ export default function SignUpPage() {
       <div className="px-6 flex-1 relative z-10 animate-slide-up mt-4">
         <div className="relative group">
           <input
-            id="name"
+            id="token"
             type="text"
-            placeholder="e.g. Sumit Rawat"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="qr-cus-..."
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleContinue()}
-            className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-primary/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
+            className="w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-5 py-5 text-white placeholder:text-white/30 focus:border-[#7B2FF7]/50 focus:bg-white/10 transition-all duration-300 text-lg shadow-[0_8px_32px_rgba(0,0,0,0.2)] outline-none"
             autoFocus
-            autoComplete="name"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
           />
-          <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
+          <div className="absolute inset-0 rounded-2xl bg-[#7B2FF7]/20 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity -z-10 pointer-events-none" />
         </div>
         {error && <p className="text-danger text-sm mt-3 px-2 font-medium">{error}</p>}
-        <p className="text-sm text-white/40 mt-4 px-2">
-          Your name appears on your wallet ID card shown to merchants.
-        </p>
       </div>
 
       {/* CTA */}
       <div className="px-6 pb-12 mt-auto pt-8 relative z-10">
         <button
-          id="signup-continue"
+          id="login-continue"
           onClick={handleContinue}
-          disabled={!name.trim() || loading}
-          className="btn-primary flex items-center justify-center gap-2 relative overflow-hidden group mb-6"
+          disabled={!token.trim() || loading}
+          className="w-full bg-[#7B2FF7] text-white rounded-2xl h-[60px] font-semibold text-lg hover:bg-[#6820df] transition-colors flex items-center justify-center gap-2 relative overflow-hidden group mb-6 shadow-[0_0_30px_rgba(123,47,247,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <div className="w-6 h-6 rounded-full border-2 border-white/30 border-t-white animate-spin relative z-10" />
           ) : (
             <>
-              <span className="relative z-10 font-bold text-lg">Continue</span>
+              <span className="relative z-10">Access Wallet</span>
               <ChevronRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
             </>
           )}
@@ -94,8 +96,8 @@ export default function SignUpPage() {
         </button>
 
         <div className="text-center">
-          <Link to="/login" className="text-white/50 hover:text-white transition-colors text-sm font-medium">
-            Already have a wallet? Log in
+          <Link to="/signup" className="text-white/50 hover:text-white transition-colors text-sm font-medium">
+            Don't have a wallet? Create one
           </Link>
         </div>
       </div>
