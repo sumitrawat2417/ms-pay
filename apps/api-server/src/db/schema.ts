@@ -8,6 +8,7 @@ export const consumers = sqliteTable('consumers', {
   lastName: text('last_name').notNull(),
   phone: text('phone').notNull().unique(),
   idQrToken: text('id_qr_token').notNull().unique(),
+  passcodeHash: text('passcode_hash'), // Nullable initially to allow legacy users
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';
+import { setConsumerPasscode } from '@ms-pay/api-client';
 
 const DIGITS = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
 
 export default function SetPasscodePage() {
   const [code, setCode] = useState<string[]>([]);
   const [confirm, setConfirm] = useState<string[]>([]);
-  const [step, setStep] = useState<'set' | 'confirm'>('set');
+  const [step, setStep] = useState<'set' | 'confirm' | 'saving'>('set');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -31,8 +32,14 @@ export default function SetPasscodePage() {
       } else {
         // confirm step
         if (next.join('') === code.join('')) {
-          // Passcode matches — navigate home
-          navigate('/home', { replace: true });
+          setStep('saving');
+          setConsumerPasscode(btoa(code.join(''))).then(() => {
+            navigate('/home', { replace: true });
+          }).catch(() => {
+            setError('Failed to save passcode. Try again.');
+            setStep('confirm');
+            setConfirm([]);
+          });
         } else {
           setError('Passcodes don\'t match. Try again.');
           setConfirm([]);
@@ -42,6 +49,14 @@ export default function SetPasscodePage() {
   };
 
   const dots = Array(6).fill(null);
+
+  if (step === 'saving') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#050505]">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#050505] relative overflow-hidden">

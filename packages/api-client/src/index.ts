@@ -149,6 +149,13 @@ export async function requestPasscodeReset(payload: PasscodeResetPayload): Promi
   });
 }
 
+export async function setConsumerPasscode(passcodeHash: string): Promise<ApiResponse<{ message: string }>> {
+  return fetchApi<{ message: string }>('/api/customer/set-passcode', {
+    method: 'POST',
+    body: JSON.stringify({ passcodeHash }),
+  });
+}
+
 // ─── Merchant Operations ──────────────────────────────────────────────────────
 
 export async function submitMerchantAssistedPay(payload: {

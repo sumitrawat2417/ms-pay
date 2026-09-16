@@ -134,7 +134,15 @@ app.post('/api/transactions/pay', async (c) => {
     const merchant = await db.select().from(merchants).where(eq(merchants.storeQrToken, storeQrToken)).limit(1);
     if (!merchant.length) return c.json({ success: false, data: null, error: 'Merchant not found' }, 404);
 
-    // 2. Check wallet balance
+    // 2. Find consumer and check passcode
+    const consumerRecord = await db.select().from(consumers).where(eq(consumers.id, userId)).limit(1);
+    if (!consumerRecord.length) return c.json({ success: false, data: null, error: 'Consumer not found' }, 404);
+    
+    if (consumerRecord[0].passcodeHash !== body.passcodeHash) {
+      return c.json({ success: false, data: null, error: 'Incorrect passcode' }, 401);
+    }
+
+    // 3. Check wallet balance
     const userWallet = await db.select().from(wallets).where(eq(wallets.consumerId, userId)).limit(1);
     if (!userWallet.length || userWallet[0].balanceMsp < amountMsp) {
       return c.json({ success: false, data: null, error: 'Insufficient balance' }, 400);
@@ -182,9 +190,12 @@ app.post('/api/transactions/merchant-assisted-pay', async (c) => {
     if (!consumerRecord.length) return c.json({ success: false, data: null, error: 'Consumer not found' }, 404);
     const consumer = consumerRecord[0];
 
-    // MOCK PASSCODE CHECK: We will assume '1234' is the universal correct PIN for now.
-    if (consumerPasscode !== '1234') {
+    // Check Passcode
+    if (consumer.passcodeHash && consumer.passcodeHash !== consumerPasscode) {
       return c.json({ success: false, data: null, error: 'Incorrect Passcode' }, 401);
+    } else if (!consumer.passcodeHash && consumerPasscode !== btoa('123456')) {
+       // fallback for seed user before passcode hash was set
+       return c.json({ success: false, data: null, error: 'Incorrect Passcode' }, 401);
     }
 
     // 2. Find merchant to get their name
@@ -367,6 +378,25 @@ app.post('/api/customer/login', async (c) => {
 
     return c.json({ success: true, data: user[0] });
   } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
+app.post('/api/customer/set-passcode', async (c) => {
+  const userId = c.get('userId');
+  if (!userId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+
+  try {
+    const body = await c.req.json();
+    if (!body.passcodeHash) return c.json({ success: false, data: null, error: 'Missing passcodeHash' }, 400);
+
+    await db.update(consumers)
+      .set({ passcodeHash: body.passcodeHash })
+      .where(eq(consumers.id, userId));
+
+    return c.json({ success: true, data: { message: 'Passcode updated successfully' } });
+  } catch (err: any) {
+    console.error(err);
     return c.json({ success: false, data: null, error: err.message }, 500);
   }
 });

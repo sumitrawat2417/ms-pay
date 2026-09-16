@@ -6,19 +6,12 @@ import process from 'node:process';
 async function seed() {
   const client = createClient({ url: 'file:sqlite3.db' });
   
-  // 1. Run migrations
-  const sqlContent = readFileSync(join(process.cwd(), 'drizzle/0000_flawless_william_stryker.sql'), 'utf-8');
-  const statements = sqlContent.split('--> statement-breakpoint').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+  // Migrations are now handled by `npm run db:push`
   
-  console.log('Running migrations...');
-  for (const stmt of statements) {
-    try {
-      await client.execute(stmt);
-    } catch (e: any) {
-      if (!e.message.includes('already exists')) {
-        console.error('Migration error on statement:', stmt, e);
-      }
-    }
+  try {
+    await client.execute('ALTER TABLE consumers ADD COLUMN passcode_hash text;');
+  } catch (e: any) {
+    // ignore if already exists
   }
 
   // 2. Insert mock data to match frontend requirements
@@ -26,8 +19,8 @@ async function seed() {
   
   try {
     await client.execute(`
-      INSERT INTO consumers (id, first_name, last_name, phone, id_qr_token) 
-      VALUES ('consumer-001', 'Sumit', 'Rawat', '9876543210', 'qr-consumer-001-demo')
+      INSERT INTO consumers (id, first_name, last_name, phone, id_qr_token, passcode_hash) 
+      VALUES ('consumer-001', 'Sumit', 'Rawat', '9876543210', 'qr-consumer-001-demo', 'MTIzNDU2')
       ON CONFLICT DO NOTHING;
     `);
 

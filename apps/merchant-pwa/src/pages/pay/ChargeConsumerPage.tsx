@@ -26,7 +26,7 @@ export default function ChargeConsumerPage() {
       });
     } else if (step === 'PASSCODE') {
       setPasscode((prev) => {
-        if (prev.length >= 4) return prev;
+        if (prev.length >= 6) return prev;
         return prev + num;
       });
     }
@@ -47,7 +47,7 @@ export default function ChargeConsumerPage() {
   };
 
   const handleSubmitPayment = async () => {
-    if (passcode.length !== 4) return;
+    if (passcode.length !== 6) return;
     
     setLoading(true);
     setError(null);
@@ -55,7 +55,7 @@ export default function ChargeConsumerPage() {
       // Make real API call to the new Mode A endpoint
       const res = await submitMerchantAssistedPay({
         consumerIdQrToken: consumerToken || '',
-        consumerPasscode: passcode,
+        consumerPasscode: btoa(passcode),
         amountMsp: Number(amount)
       });
       
@@ -121,7 +121,7 @@ export default function ChargeConsumerPage() {
 
           {/* PIN Dots */}
           <div className="flex justify-center gap-4 mb-8">
-            {[0, 1, 2, 3].map((i) => (
+            {[0, 1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
                 className={`w-4 h-4 rounded-full transition-all duration-300 ${
@@ -162,7 +162,7 @@ export default function ChargeConsumerPage() {
           </div>
           <button
             onClick={handleSubmitPayment}
-            disabled={passcode.length < 4 || loading}
+            disabled={passcode.length < 6 || loading}
             className="w-full bg-primary text-primary-foreground font-semibold py-4 rounded-2xl active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Confirm Payment'}
