@@ -246,6 +246,36 @@ app.get('/api/transactions', async (c) => {
   }
 });
 
+app.get('/api/merchant/dashboard', async (c) => {
+  const merchantId = c.get('userId');
+  if (!merchantId) return c.json({ success: false, data: null, error: 'Unauthorized' }, 401);
+  try {
+    const txData = await db.select().from(transactions).where(eq(transactions.merchantId, merchantId)).orderBy(desc(transactions.createdAt)).limit(50);
+    
+    // Calculate today's collections
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todaysTransactions = txData.filter(tx => new Date(tx.createdAt) >= today);
+    const todaysCollections = todaysTransactions.reduce((acc, tx) => acc + tx.amountMsp, 0);
+
+    const formatted = txData.map(tx => ({
+      ...tx,
+      createdAt: String(tx.createdAt),
+      amountMsp: Number(tx.amountMsp)
+    }));
+    
+    return c.json({ 
+      success: true, 
+      data: {
+        todaysCollections,
+        recentTransactions: formatted.slice(0, 5)
+      } 
+    });
+  } catch (err: any) {
+    return c.json({ success: false, data: null, error: err.message }, 500);
+  }
+});
+
 app.get('/api/resolve-qr/:token', async (c) => {
   const token = c.req.param('token');
   try {

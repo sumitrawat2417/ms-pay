@@ -9,6 +9,7 @@ import type {
   SelfRechargePayload,
   Transaction,
   WalletBalanceResponse,
+  MerchantDashboardResponse,
 } from '@ms-pay/types';
 
 // We hardcode localhost:3000 here to ensure all requests go to the real local backend.
@@ -157,6 +158,10 @@ export async function setConsumerPasscode(passcodeHash: string): Promise<ApiResp
 }
 
 // ─── Merchant Operations ──────────────────────────────────────────────────────
+
+export async function getMerchantDashboard(): Promise<ApiResponse<MerchantDashboardResponse>> {
+  return fetchApi<MerchantDashboardResponse>('/api/merchant/dashboard');
+}
 
 export async function submitMerchantAssistedPay(payload: {
   consumerIdQrToken: string;

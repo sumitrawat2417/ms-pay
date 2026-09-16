@@ -3,15 +3,11 @@ import { QrCode, ArrowDownLeft, Moon, Sun } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from 'react';
 
-// Mock data until API is hooked up
-const mockTransactions = [
-  { id: '1', amount: 150.00, customerName: 'Alice Johnson', type: 'sale_consumer_initiated', time: '10:45 AM' },
-  { id: '2', amount: 45.50, customerName: 'Bob Smith', type: 'sale_consumer_initiated', time: '09:20 AM' },
-  { id: '3', amount: 320.00, customerName: 'Charlie Brown', type: 'sale_merchant_assisted', time: 'Yesterday' },
-];
+import { useMerchantDashboard } from '@/hooks/useMerchantDashboard';
 
 export default function MerchantHomePage() {
   const merchantName = useAuthStore((s) => s.storeName) || 'Store Owner';
+  const { data, isLoading } = useMerchantDashboard();
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(false);
 
@@ -62,10 +58,16 @@ export default function MerchantHomePage() {
               <p className="text-[#A3A3A3] text-sm font-medium mb-3 font-inter">Today's Collections (MSP)</p>
               
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-5xl font-sora font-bold text-white tracking-tight">
-                  1,245.50
-                </span>
-                <span className="text-xl font-sora font-semibold text-white/70">MSP</span>
+                {isLoading ? (
+                  <div className="h-12 w-48 bg-white/10 rounded animate-pulse" />
+                ) : (
+                  <>
+                    <span className="text-5xl font-sora font-bold text-white tracking-tight">
+                      {data?.todaysCollections.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                    </span>
+                    <span className="text-xl font-sora font-semibold text-white/70">MSP</span>
+                  </>
+                )}
               </div>
 
               {/* Quick Actions */}
@@ -97,36 +99,55 @@ export default function MerchantHomePage() {
           </Link>
         </div>
 
-        <div className="space-y-3">
-          {mockTransactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="flex items-center gap-4 bg-card p-4 rounded-3xl border border-border shadow-soft transition-all active:scale-[0.98] group"
-            >
-              <div className="w-12 h-12 rounded-[18px] flex items-center justify-center transition-colors bg-success/10 text-success">
-                <ArrowDownLeft size={20} strokeWidth={2.5} />
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4 bg-card p-4 rounded-3xl border border-border animate-pulse">
+                <div className="w-12 h-12 rounded-[18px] bg-muted" />
+                <div className="flex-1">
+                  <div className="h-4 w-32 bg-muted rounded mb-2" />
+                  <div className="h-3 w-20 bg-muted rounded" />
+                </div>
+                <div className="h-5 w-16 bg-muted rounded" />
               </div>
-              
-              <div className="flex-1 min-w-0">
-                <p className="text-foreground font-sora font-semibold truncate text-sm">
-                  {tx.customerName}
-                </p>
-                <p className="text-muted-foreground text-[11px] mt-1 font-medium font-inter truncate">
-                  Received Payment
-                </p>
+            ))}
+          </div>
+        ) : !data?.recentTransactions?.length ? (
+          <div className="text-center py-10 bg-card rounded-3xl border border-border">
+            <p className="text-muted-foreground text-sm font-inter">No recent activity</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {data.recentTransactions.map((tx) => (
+              <div
+                key={tx.id}
+                className="flex items-center gap-4 bg-card p-4 rounded-3xl border border-border shadow-soft transition-all active:scale-[0.98] group"
+              >
+                <div className="w-12 h-12 rounded-[18px] flex items-center justify-center transition-colors bg-success/10 text-success">
+                  <ArrowDownLeft size={20} strokeWidth={2.5} />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground font-sora font-semibold truncate text-sm">
+                    {tx.type === 'sale_consumer_initiated' ? 'Customer Scan' : 'Merchant Scan'}
+                  </p>
+                  <p className="text-muted-foreground text-[11px] mt-1 font-medium font-inter truncate">
+                    Received Payment
+                  </p>
+                </div>
+                
+                <div className="text-right flex flex-col items-end">
+                  <p className="font-sora font-semibold text-sm text-success">
+                    + {tx.amountMsp.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-muted-foreground text-[10px] mt-1 font-medium font-inter">
+                    {new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </p>
+                </div>
               </div>
-              
-              <div className="text-right flex flex-col items-end">
-                <p className="font-sora font-semibold text-sm text-success">
-                  + {tx.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </p>
-                <p className="text-muted-foreground text-[10px] mt-1 font-medium font-inter">
-                  {tx.time}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

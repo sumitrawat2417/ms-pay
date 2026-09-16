@@ -104,3 +104,8 @@ export interface PasscodeResetPayload {
   consumerId: string;
   reason?: string;
 }
+
+export interface MerchantDashboardResponse {
+  todaysCollections: number;
+  recentTransactions: Transaction[];
+}
