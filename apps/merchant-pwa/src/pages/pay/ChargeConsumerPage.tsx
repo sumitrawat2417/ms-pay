@@ -9,7 +9,7 @@ type Step = 'AMOUNT' | 'PASSCODE' | 'SUCCESS';
 export default function ChargeConsumerPage() {
   const navigate = useNavigate();
   const { consumerToken } = useParams<{ consumerToken: string }>();
-  const merchantName = useAuthStore((s) => s.merchantName);
+  const merchantName = useAuthStore((s) => s.storeName);
   
   const [step, setStep] = useState<Step>('AMOUNT');
   const [amount, setAmount] = useState('0');
