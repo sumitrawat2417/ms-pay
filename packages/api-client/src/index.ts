@@ -161,7 +161,7 @@ export async function submitMerchantAssistedPay(payload: {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'x-user-id': 'merchant-001' // Mock merchant ID auth
+        'x-user-id': currentUserId
       },
       body: JSON.stringify(payload),
     });

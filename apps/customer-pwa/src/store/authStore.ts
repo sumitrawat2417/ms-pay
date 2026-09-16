@@ -25,3 +25,19 @@ export const useAuthStore = create<AuthState>()(
     { name: 'ms-pay-auth' }
   )
 );
+
+// Sync auth state with API client
+import { setAuthUser } from '@ms-pay/api-client';
+
+useAuthStore.subscribe((state) => {
+  if (state.consumerId) {
+    setAuthUser(state.consumerId);
+  }
+});
+
+// Initialize on load
+const initialState = useAuthStore.getState();
+if (initialState.consumerId) {
+  setAuthUser(initialState.consumerId);
+}
+

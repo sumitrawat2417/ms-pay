@@ -37,3 +37,18 @@ export const useAuthStore = create<AuthState>()(
     { name: 'ms-merchant-auth' }
   )
 );
+
+// Sync auth state with API client
+import { setAuthUser } from '@ms-pay/api-client';
+
+useAuthStore.subscribe((state) => {
+  if (state.merchantId) {
+    setAuthUser(state.merchantId);
+  }
+});
+
+// Initialize on load
+const initialState = useAuthStore.getState();
+if (initialState.merchantId) {
+  setAuthUser(initialState.merchantId);
+}

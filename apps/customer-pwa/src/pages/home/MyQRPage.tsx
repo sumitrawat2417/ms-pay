@@ -42,7 +42,7 @@ export default function MyQRPage() {
 
           <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm mx-auto w-fit">
             <QRCode
-              value={idQrToken || 'error'}
+              value={idQrToken ? JSON.stringify({ type: 'consumer', consumerIdQrToken: idQrToken }) : 'error'}
               size={200}
               level="H"
               bgColor="#ffffff"
