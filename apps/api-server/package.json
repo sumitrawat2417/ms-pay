@@ -16,7 +16,7 @@
     "hono": "^4.3.7",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.30.10",
-    "@libsql/client": "^0.6.0",
+    "@libsql/client": "^0.18.0",
     "@ms-pay/types": "workspace:*"
   },
   "devDependencies": {
