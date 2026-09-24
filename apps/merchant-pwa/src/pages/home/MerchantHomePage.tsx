@@ -22,7 +22,7 @@ export default function MerchantHomePage() {
   };
 
   return (
-    <div className="page pb-28">
+    <div className="pb-28">
       {/* Header */}
       <header className="px-6 pt-12 pb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">

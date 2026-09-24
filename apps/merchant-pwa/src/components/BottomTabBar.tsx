@@ -1,11 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { Home, QrCode, Bell, History, User } from 'lucide-react';
+import { Home, QrCode, History, User } from 'lucide-react';
 import { usePendingRequestCount } from '@/hooks/useRequests';
 
-const tabs = [
-  { to: '/home',     icon: Home,    label: 'Home' },
-  { to: '/pay/scan', icon: QrCode,  label: 'Scan' },
-  { to: '/requests', icon: Bell,    label: 'Requests', badge: true },
+const tabs: { to: string, icon: any, label: string, badge?: boolean }[] = [
+  { to: '/',         icon: Home,    label: 'Home' },
+  { to: '/scan-consumer', icon: QrCode,  label: 'Scan' },
   { to: '/history',  icon: History, label: 'History' },
   { to: '/profile',  icon: User,    label: 'Profile' },
 ];

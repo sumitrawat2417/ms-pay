@@ -12,6 +12,9 @@ import MerchantHomePage from '@/pages/home/MerchantHomePage';
 import StoreQRPage from '@/pages/qr/StoreQRPage';
 import ScanConsumerPage from '@/pages/pay/ScanConsumerPage';
 import ChargeConsumerPage from '@/pages/pay/ChargeConsumerPage';
+import HistoryPage from '@/pages/history/HistoryPage';
+import ProfilePage from '@/pages/account/ProfilePage';
+import AppShell from '@/components/AppShell';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -43,11 +46,15 @@ export function Router() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected */}
-          <Route path="/" element={<RequireAuth><MerchantHomePage /></RequireAuth>} />
-          <Route path="/store-qr" element={<RequireAuth><StoreQRPage /></RequireAuth>} />
-          <Route path="/scan-consumer" element={<RequireAuth><ScanConsumerPage /></RequireAuth>} />
-          <Route path="/charge/:consumerToken" element={<RequireAuth><ChargeConsumerPage /></RequireAuth>} />
+          {/* Protected with AppShell */}
+          <Route element={<RequireAuth><AppShell /></RequireAuth>}>
+            <Route path="/" element={<MerchantHomePage />} />
+            <Route path="/store-qr" element={<StoreQRPage />} />
+            <Route path="/scan-consumer" element={<ScanConsumerPage />} />
+            <Route path="/charge/:consumerToken" element={<ChargeConsumerPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
