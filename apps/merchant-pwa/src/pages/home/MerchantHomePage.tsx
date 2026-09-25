@@ -47,42 +47,42 @@ export default function MerchantHomePage() {
       </header>
 
       {/* Hero Earnings Card */}
-      <div className="px-6 mb-10">
-        <div className="relative rounded-[32px] p-1 brand-gradient shadow-elevation-high overflow-hidden">
+      <div className="px-6 mb-8">
+        <div className="relative rounded-3xl p-[2px] brand-gradient shadow-glass overflow-hidden">
           {/* Dedicated dark panel for legibility constraint */}
-          <div className="bg-[#111111] rounded-[28px] p-6 relative overflow-hidden">
+          <div className="bg-[#111111] rounded-[22px] p-5 relative overflow-hidden">
             {/* Subtle brand glow inside the dark panel */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
             
             <div className="relative z-10 flex flex-col items-start">
-              <p className="text-[#A3A3A3] text-sm font-medium mb-3 font-inter">Today's Collections (MSP)</p>
+              <p className="text-[#A3A3A3] text-xs font-medium mb-1.5 font-inter">Today's Collections (MSP)</p>
               
-              <div className="flex items-baseline gap-2 mb-4">
+              <div className="flex items-baseline gap-1.5 mb-5">
                 {isLoading ? (
-                  <div className="h-12 w-48 bg-white/10 rounded animate-pulse" />
+                  <div className="h-10 w-40 bg-white/10 rounded animate-pulse" />
                 ) : (
                   <>
-                    <span className="text-5xl font-sora font-bold text-white tracking-tight">
+                    <span className="text-4xl font-sora font-bold text-white tracking-tight">
                       {data?.todaysCollections.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                     </span>
-                    <span className="text-xl font-sora font-semibold text-white/70">MSP</span>
+                    <span className="text-sm font-sora font-semibold text-white/70">MSP</span>
                   </>
                 )}
               </div>
 
               {/* Quick Actions */}
-              <div className="flex gap-3 w-full mt-2">
+              <div className="flex gap-3 w-full">
                 <button 
                   onClick={() => navigate('/store-qr')}
-                  className="flex-1 bg-white text-black font-semibold font-inter py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                  className="flex-1 bg-white text-black font-semibold font-inter py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm"
                 >
-                  <QrCode size={18} /> Show QR
+                  <QrCode size={16} /> Show QR
                 </button>
                 <button 
                   onClick={() => navigate('/scan-consumer')}
-                  className="flex-1 bg-white/10 text-white font-semibold font-inter py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform border border-white/10"
+                  className="flex-1 bg-white/10 hover:bg-white/15 text-white font-semibold font-inter py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 active:scale-95 transition-all border border-white/10"
                 >
-                  <ArrowDownLeft size={18} /> Scan to Charge
+                  <ArrowDownLeft size={16} /> Scan to Charge
                 </button>
               </div>
             </div>
